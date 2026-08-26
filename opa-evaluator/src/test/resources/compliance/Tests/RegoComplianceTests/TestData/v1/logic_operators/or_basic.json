@@ -11,7 +11,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -385,7 +384,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -759,7 +757,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1118,7 +1115,6 @@
 				"package test\nimport future.keywords.or\n\np if {\n  false or false\n}\n"
 			],
 			"want_result": [],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1502,7 +1498,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1951,7 +1946,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2396,7 +2390,6 @@
 				"role": "guest"
 			},
 			"want_result": [],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2838,7 +2831,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -3245,7 +3237,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -4075,7 +4066,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -4901,7 +4891,6 @@
 				"y": 0
 			},
 			"want_result": [],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -5728,7 +5717,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -6328,7 +6316,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],

@@ -12,7 +12,6 @@
 				"c": true
 			},
 			"want_result": [],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -602,7 +601,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1196,7 +1194,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1790,7 +1787,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2380,7 +2376,6 @@
 				"c": false
 			},
 			"want_result": [],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2971,7 +2966,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -3744,7 +3738,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -4517,7 +4510,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -5256,7 +5248,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -5703,7 +5694,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -6186,7 +6176,6 @@
 				"b": false
 			},
 			"want_result": [],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -6668,7 +6657,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -7308,7 +7296,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],

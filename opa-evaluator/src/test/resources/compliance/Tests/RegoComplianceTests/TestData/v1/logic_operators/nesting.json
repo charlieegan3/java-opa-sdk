@@ -17,7 +17,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -786,7 +785,6 @@
 				"d": true
 			},
 			"want_result": [],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1555,7 +1553,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2328,7 +2325,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -3101,7 +3097,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],

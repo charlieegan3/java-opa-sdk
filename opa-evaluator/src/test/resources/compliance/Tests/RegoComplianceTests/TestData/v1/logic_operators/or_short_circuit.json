@@ -15,7 +15,6 @@
 				}
 			],
 			"strict_error": true,
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -594,7 +593,6 @@
 			"want_error_code": "eval_builtin_error",
 			"want_error": "to_number",
 			"strict_error": true,
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1173,7 +1171,6 @@
 				}
 			],
 			"strict_error": true,
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],

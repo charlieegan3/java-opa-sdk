@@ -15,7 +15,6 @@
 					"x": false
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -615,7 +614,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1215,7 +1213,6 @@
 					"x": "fallback"
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1789,7 +1786,6 @@
 					"x": "fallback"
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2379,7 +2375,6 @@
 					"x": "ok"
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -3000,7 +2995,6 @@
 					"x": "secondary"
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],

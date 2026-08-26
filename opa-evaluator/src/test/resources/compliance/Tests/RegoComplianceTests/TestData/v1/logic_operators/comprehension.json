@@ -22,7 +22,6 @@
 					]
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -650,7 +649,6 @@
 					]
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1314,7 +1312,6 @@
 				}
 			],
 			"sort_bindings": true,
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1940,7 +1937,6 @@
 					}
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2592,7 +2588,6 @@
 					]
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -3331,7 +3326,6 @@
 				}
 			],
 			"sort_bindings": true,
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -4212,7 +4206,6 @@
 				}
 			],
 			"sort_bindings": true,
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],

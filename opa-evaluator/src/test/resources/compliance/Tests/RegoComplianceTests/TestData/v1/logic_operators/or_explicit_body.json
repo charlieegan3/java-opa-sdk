@@ -14,7 +14,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -543,7 +542,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1072,7 +1070,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -1626,7 +1623,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2176,7 +2172,6 @@
 				"package test\nimport future.keywords.or\n\np if {\n  { a := 0; a \u003e 0 } or { b := 0; b \u003e 0 }\n}\n"
 			],
 			"want_result": [],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -2723,7 +2718,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],
@@ -3286,7 +3280,6 @@
 					"x": true
 				}
 			],
-			"experimental_keywords": true,
 			"entrypoints": [
 				"eval"
 			],

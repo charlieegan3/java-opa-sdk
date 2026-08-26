@@ -1,5 +1,6 @@
 package io.github.open_policy_agent.opa.proto;
 
+import io.github.open_policy_agent.opa.ir.Location;
 import io.github.open_policy_agent.opa.ir.Operand;
 import io.github.open_policy_agent.opa.ir.policy.Block;
 import io.github.open_policy_agent.opa.ir.policy.BuiltinFunc;
@@ -10,6 +11,7 @@ import io.github.open_policy_agent.opa.ir.policy.Plans;
 import io.github.open_policy_agent.opa.ir.policy.Policy;
 import io.github.open_policy_agent.opa.ir.policy.Static;
 import io.github.open_policy_agent.opa.ir.policy.StringConst;
+import io.github.open_policy_agent.opa.ir.policy.UnplannedRule;
 import io.github.open_policy_agent.opa.ir.stmts.ArrayAppendStmt;
 import io.github.open_policy_agent.opa.ir.stmts.AssignIntStmt;
 import io.github.open_policy_agent.opa.ir.stmts.AssignVarOnceStmt;
@@ -60,8 +62,8 @@ import java.util.List;
  *
  * <p>The proto types (generated under {@code opa.ir.v1}) collide by simple name with several SDK
  * model types ({@code Policy}, {@code Static}, {@code Block}, {@code Stmt}, {@code Operand}, {@code
- * Val}). To keep the SDK types imported and readable, proto payloads are bound with {@code var}
- * rather than named explicitly.
+ * Val}, {@code Location}). To keep the SDK types imported and readable, proto payloads are bound
+ * with {@code var} rather than named explicitly.
  */
 final class PlanMapper {
 
@@ -71,7 +73,17 @@ final class PlanMapper {
     Static staticField = toStatic(proto.getStatic());
     Plans plans = toPlans(proto.getPlans());
     Funcs funcs = toFuncs(proto.getFuncs());
-    return new Policy(staticField, plans, funcs);
+
+    List<UnplannedRule> unplannedRules = new ArrayList<>(proto.getUnplannedRulesCount());
+    for (var r : proto.getUnplannedRulesList()) {
+      var loc = r.getLocation();
+      unplannedRules.add(
+          new UnplannedRule(
+              r.getPath(),
+              new Location(loc.getFile(), loc.getCol(), loc.getRow(), loc.getEndCol(), loc.getEndRow())));
+    }
+
+    return new Policy(staticField, plans, funcs, unplannedRules);
   }
 
   private static Static toStatic(opa.ir.v1.Static proto) {

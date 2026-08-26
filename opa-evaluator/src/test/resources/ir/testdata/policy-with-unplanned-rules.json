@@ -1,0 +1,8 @@
+{
+  "unplanned_rules": [
+    {
+      "path": "data.example.unused",
+      "location": {"file": 0, "col": 1, "row": 11, "end_col": 15, "end_row": 11}
+    }
+  ]
+}

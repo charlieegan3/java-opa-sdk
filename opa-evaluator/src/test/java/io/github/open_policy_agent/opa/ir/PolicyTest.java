@@ -19,6 +19,7 @@ import io.github.open_policy_agent.opa.ir.policy.Plans;
 import io.github.open_policy_agent.opa.ir.policy.Policy;
 import io.github.open_policy_agent.opa.ir.policy.Static;
 import io.github.open_policy_agent.opa.ir.policy.StringConst;
+import io.github.open_policy_agent.opa.ir.policy.UnplannedRule;
 import io.github.open_policy_agent.opa.ir.policy.types.AnyType;
 import io.github.open_policy_agent.opa.ir.policy.types.ArrayType;
 import io.github.open_policy_agent.opa.ir.policy.types.BooleanType;
@@ -1135,5 +1136,24 @@ class PolicyTest {
     assertNull(policy.getFuncs());
     assertNull(policy.getStatic());
     assertNull(policy.getPlans());
+  }
+
+  @Test
+  public void testPolicyDeserialization_unplannedRules() throws IOException {
+    File jsonFile =
+        new File(
+            Objects.requireNonNull(
+                    getClass()
+                        .getClassLoader()
+                        .getResource("ir/testdata/policy-with-unplanned-rules.json"))
+                .getFile());
+
+    Policy policy = policyReader.read(Files.newInputStream(jsonFile.toPath()));
+    assertNotNull(policy, "Policy should not be null");
+    assertEquals(1, policy.getUnplannedRules().size());
+
+    UnplannedRule unplannedRule = policy.getUnplannedRules().get(0);
+    assertEquals("data.example.unused", unplannedRule.getPath());
+    assertEquals(new Location(0, 1, 11, 15, 11), unplannedRule.getLocation());
   }
 }

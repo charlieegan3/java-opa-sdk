@@ -1,5 +1,6 @@
 package io.github.open_policy_agent.opa.jackson;
 
+import io.github.open_policy_agent.opa.ir.Location;
 import io.github.open_policy_agent.opa.ir.Operand;
 import io.github.open_policy_agent.opa.ir.policy.types.Type;
 import io.github.open_policy_agent.opa.ir.stmts.Stmt;
@@ -19,6 +20,7 @@ public class IrModule extends SimpleModule {
 
   public IrModule() {
     super("opa-ir");
+    addDeserializer(Location.class, new LocationDeserializer());
     addDeserializer(Operand.class, new OperandDeserializer());
     addDeserializer(Stmt.class, new StmtDeserializer());
     addDeserializer(Type.class, new TypeDeserializer());

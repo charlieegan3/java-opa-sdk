@@ -1,5 +1,6 @@
 package io.github.open_policy_agent.opa.ir.policy;
 
+import java.util.List;
 import java.util.Objects;
 
 /** Represents a planned policy query. */
@@ -12,17 +13,33 @@ public class Policy {
 
   private Funcs funcs;
 
-  public Policy(Static staticField, Plans plans, Funcs funcs) {
+  private List<UnplannedRule> unplannedRules;
+
+  public Policy(Static staticField, Plans plans, Funcs funcs, List<UnplannedRule> unplannedRules) {
     this.staticField = staticField;
     this.plans = plans;
     this.funcs = funcs;
+    this.unplannedRules = unplannedRules;
+  }
+
+  public Policy(Static staticField, Plans plans, Funcs funcs) {
+    this(staticField, plans, funcs, null);
   }
 
   public Policy() {}
 
   @Override
   public String toString() {
-    return "Policy{" + "staticField=" + staticField + ", plans=" + plans + ", funcs=" + funcs + '}';
+    return "Policy{"
+        + "staticField="
+        + staticField
+        + ", plans="
+        + plans
+        + ", funcs="
+        + funcs
+        + ", unplannedRules="
+        + unplannedRules
+        + '}';
   }
 
   public Static getStatic() {
@@ -49,6 +66,14 @@ public class Policy {
     this.funcs = funcs;
   }
 
+  public List<UnplannedRule> getUnplannedRules() {
+    return unplannedRules;
+  }
+
+  public void setUnplannedRules(List<UnplannedRule> unplannedRules) {
+    this.unplannedRules = unplannedRules;
+  }
+
   @Override
   public boolean equals(Object o) {
       if (this == o) {
@@ -66,7 +91,10 @@ public class Policy {
       if (!Objects.equals(plans, policy.plans)) {
           return false;
       }
-    return Objects.equals(funcs, policy.funcs);
+      if (!Objects.equals(funcs, policy.funcs)) {
+          return false;
+      }
+    return Objects.equals(unplannedRules, policy.unplannedRules);
   }
 
   @Override
@@ -74,6 +102,7 @@ public class Policy {
     int result = staticField != null ? staticField.hashCode() : 0;
     result = 31 * result + (plans != null ? plans.hashCode() : 0);
     result = 31 * result + (funcs != null ? funcs.hashCode() : 0);
+    result = 31 * result + (unplannedRules != null ? unplannedRules.hashCode() : 0);
     return result;
   }
 }

@@ -1,5 +1,6 @@
 package io.github.open_policy_agent.opa.ir.policy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,6 +45,26 @@ public class Policy {
 
   public Static getStatic() {
     return staticField;
+  }
+
+  /**
+   * The plan's file table: index -&gt; filename, in the order the planner assigned indices.
+   *
+   * <p>Coverage data identifies source locations by file index, so consumers need this to resolve
+   * an index back to a path. Indices are plan-local, so a table from one policy must never be used
+   * to resolve another's.
+   *
+   * @return filenames by plan file index
+   */
+  public List<String> getStaticFilenames() {
+    if (staticField == null || staticField.getFiles() == null) {
+      return List.of();
+    }
+    List<String> filenames = new ArrayList<>(staticField.getFiles().size());
+    for (StringConst file : staticField.getFiles()) {
+      filenames.add(file == null ? null : file.getValue());
+    }
+    return filenames;
   }
 
   public void setStatic(Static staticField) {

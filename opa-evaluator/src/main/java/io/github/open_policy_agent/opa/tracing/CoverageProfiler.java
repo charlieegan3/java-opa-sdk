@@ -2,10 +2,10 @@ package io.github.open_policy_agent.opa.tracing;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import io.github.open_policy_agent.opa.ir.Location;
 
 /**
@@ -21,10 +21,14 @@ import io.github.open_policy_agent.opa.ir.Location;
  * one which exited the block. Those ranges are reported as not-covered, which
  * matches the expected coverage semantics.
  *
+ * <p>Thread-safe: a single instance may be shared across concurrent evaluations (see {@link
+ * CoverageRecorder}). Mutation goes through concurrent collections and the accessors return
+ * snapshots, so readers never see a partially-updated map or race a concurrent {@code addEntry}.
+ *
  * <p>If only location tracing is required, this is a more performant alternative to {@link DurationProfiler}
  */
 public class CoverageProfiler implements Profiler {
-  private final Map<Integer, Set<Range>> hitsByFile = new HashMap<>();
+  private final Map<Integer, Set<Range>> hitsByFile = new ConcurrentHashMap<>();
 
   @Override
   public void addStart() {
@@ -33,23 +37,31 @@ public class CoverageProfiler implements Profiler {
 
   @Override
   public void addEntry(Location location, long duration) {
-      if (location == null) {
-          return;
-      }
-    hitsByFile.computeIfAbsent(location.getFile(), k -> new HashSet<>()).add(Range.of(location));
+    if (location == null) {
+      return;
+    }
+    hitsByFile
+        .computeIfAbsent(location.getFile(), k -> ConcurrentHashMap.newKeySet())
+        .add(Range.of(location));
   }
 
   /**
    * @return per-file map of executed source ranges. Outer key is the file index in the policy's
-   *     static file table; inner value is the set of source ranges that were executed.
+   *     static file table; inner value is the set of source ranges that were executed. The returned
+   *     map is a snapshot; later {@code addEntry} calls are not reflected in it.
    */
   public Map<Integer, Set<Range>> getCoveredRanges() {
-    return Collections.unmodifiableMap(hitsByFile);
+    Map<Integer, Set<Range>> snapshot = new HashMap<>();
+    for (Map.Entry<Integer, Set<Range>> entry : hitsByFile.entrySet()) {
+      snapshot.put(entry.getKey(), Set.copyOf(entry.getValue()));
+    }
+    return Collections.unmodifiableMap(snapshot);
   }
 
   /**
    * @return map of executed source rows (per file), derived from the recorded ranges, for any
-   *     line-based consumers. Use {@link #getCoveredRanges()} for column-precise coverage.
+   *     line-based consumers. Use {@link #getCoveredRanges()} for column-precise coverage. The
+   *     returned map is a snapshot; later {@code addEntry} calls are not reflected in it.
    */
   public Map<Integer, Set<Integer>> getCoveredLines() {
     Map<Integer, Set<Integer>> rowsByFile = new HashMap<>();

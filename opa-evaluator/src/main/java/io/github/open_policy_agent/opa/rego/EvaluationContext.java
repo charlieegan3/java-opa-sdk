@@ -11,18 +11,22 @@ import io.github.open_policy_agent.opa.ast.types.RegoValue;
 import io.github.open_policy_agent.opa.cache.NdBuiltinCache;
 import io.github.open_policy_agent.opa.ir.BlockEvent;
 import io.github.open_policy_agent.opa.ir.StatementEvent;
+import io.github.open_policy_agent.opa.ir.policy.Policy;
 import io.github.open_policy_agent.opa.ir.stmts.Stmt;
 import io.github.open_policy_agent.opa.metrics.Metrics;
 import io.github.open_policy_agent.opa.metrics.NoOpMetrics;
 import io.github.open_policy_agent.opa.profiling.NoOpStatementProfiler;
 import io.github.open_policy_agent.opa.profiling.StatementProfiler;
 import io.github.open_policy_agent.opa.storage.Store;
+import io.github.open_policy_agent.opa.tracing.CoverageRecorder;
 import io.github.open_policy_agent.opa.tracing.Event;
 import io.github.open_policy_agent.opa.tracing.Operation;
 import io.github.open_policy_agent.opa.tracing.Profiler;
 import io.github.open_policy_agent.opa.tracing.QueryTracer;
 
 public class EvaluationContext {
+  private static final Logger LOGGER = new Logger.StandardLogger();
+
   public String entrypoint;
   public RegoValue input;
   public Store store;
@@ -300,7 +304,50 @@ public class EvaluationContext {
       if (statementProfiler == null) {
         statementProfiler = new NoOpStatementProfiler();
       }
+      installCoverageProfiler();
       return new EvaluationContext(this);
+    }
+
+    /**
+     * Adds the JVM-wide coverage profiler when {@code -Dopa.coverage.output} is set.
+     *
+     * <p>Every evaluation passes through here. This is what lets coverage be collected from code
+     * that never asked for it. Profilers are keyed by policy, so repeated evaluations in one JVM
+     * accumulate into the same profiler.
+     */
+    private void installCoverageProfiler() {
+      if (!CoverageRecorder.isEnabled() || store == null) {
+        return;
+      }
+
+      try {
+        // filter guards against re-adding the shared profiler if this builder is reused to
+        // build() more than once, which would deliver every callback to it repeatedly.
+        CoverageRecorder.profilerFor(policyForCoverage())
+            .filter(profiler -> !this.profilers.contains(profiler))
+            .ifPresent(this.profilers::add);
+      } catch (RuntimeException e) {
+        LOGGER.error("could not resolve policy for coverage: %s", e);
+      }
+    }
+
+    /**
+     * The policy for {@link #entrypoint}, or {@code null} when it does not resolve.
+     *
+     * <p>{@link Store#getIrPolicyForEntrypoint(String)} falls back to the first policy it finds
+     * when no plan matches, so the plan itself is checked to tell "no policy for this entrypoint"
+     * apart from "some other policy" — feeding coverage from the wrong policy back into a
+     * profiler would resolve its ranges against the wrong file table.
+     */
+    private Policy policyForCoverage() {
+      Policy policy = store.getIrPolicyForEntrypoint(entrypoint);
+      if (policy == null
+          || policy.getPlans() == null
+          || policy.getPlans().getPlans() == null
+          || policy.getPlans().getPlanByName(entrypoint) == null) {
+        return null;
+      }
+      return policy;
     }
   }
 }

@@ -1,21 +1,25 @@
 package io.github.open_policy_agent.opa.jackson;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.github.open_policy_agent.opa.ir.policy.UnplannedRule;
 import io.github.open_policy_agent.opa.tracing.CoverageProfiler;
+import io.github.open_policy_agent.opa.tracing.CoverageReport;
+import io.github.open_policy_agent.opa.tracing.CoverageReport.FileCoverage;
 import io.github.open_policy_agent.opa.tracing.Position;
 import io.github.open_policy_agent.opa.tracing.Range;
 
 /**
- * Serializes a {@link CoverageProfiler}'s collected coverage into the JSON shape produced by OPA's
- * {@code opa eval --coverage} command.
+ * Encodes a {@link CoverageReport} into the JSON shape produced by OPA's {@code opa eval
+ * --coverage} command, using Jackson.
+ *
+ * <p>The coverage semantics (covered vs. not-covered ranges, line counts, percentage) are
+ * computed upstream by {@link CoverageReport}; this class only maps that model onto Jackson nodes.
+ * It does no I/O ({@link JacksonCoverageReportWriter} calls it and writes the result out), so the
+ * report can be built and asserted on without touching disk.
  *
  * <p>Output structure:
  *
@@ -23,23 +27,27 @@ import io.github.open_policy_agent.opa.tracing.Range;
  * {
  *   "files": {
  *     "policy.rego": {
- *       "covered": [ { "start": { "row": 5, "col": 2 }, "end": { "row": 5, "col": 14 } } ]
+ *       "covered": [ { "start": { "row": 5, "col": 2 }, "end": { "row": 5, "col": 14 } } ],
+ *       "not_covered": [ { "start": { "row": 11, "col": 1 }, "end": { "row": 11, "col": 15 } } ],
+ *       "covered_lines": 1,
+ *       "not_covered_lines": 1,
+ *       "coverage": 50.0
  *     }
- *   }
+ *   },
+ *   "covered_lines": 1,
+ *   "not_covered_lines": 1,
+ *   "coverage": 50.0
  * }
  * }</pre>
  *
- * <p>Each executed statement range is emitted individually (sorted by position, not coalesced),
- * matching OPA's {@code v1/cover} report; a range's column is omitted when zero. File indices that
- * fall outside the provided filename list are skipped silently — those typically come from
- * synthetic statements with no source mapping.
+ * <p>A range's column is omitted when zero, matching OPA's {@code col,omitempty}.
  */
 public final class OpaCoverageReport {
 
   private OpaCoverageReport() {}
 
   /**
-   * Build the OPA-format coverage report.
+   * Build the OPA-format coverage report JSON.
    *
    * @param profiler the profiler that recorded coverage during evaluation
    * @param filenames file index -&gt; filename mapping, typically obtained via
@@ -47,33 +55,65 @@ public final class OpaCoverageReport {
    * @return a Jackson {@link ObjectNode} with the OPA coverage shape
    */
   public static ObjectNode from(CoverageProfiler profiler, List<String> filenames) {
+    return from(profiler, filenames, List.of());
+  }
+
+  /**
+   * Build the coverage report JSON, adding {@code not_covered} entries for rules that were never
+   * compiled into statements.
+   *
+   * @param profiler the profiler that recorded coverage during evaluation
+   * @param filenames file index -&gt; filename mapping, typically obtained via
+   *     {@code policy.getStaticField().getFiles()} mapped to {@code StringConst::getValue}
+   * @param unplannedRules rules to report as not covered, typically obtained via
+   *     {@code policy.getUnplannedRules()}
+   * @return a Jackson {@link ObjectNode} with the OPA coverage shape
+   */
+  public static ObjectNode from(
+      CoverageProfiler profiler, List<String> filenames, List<UnplannedRule> unplannedRules) {
+    return toJson(CoverageReport.from(profiler, filenames, unplannedRules));
+  }
+
+  /**
+   * Encode a computed {@link CoverageReport} into OPA's coverage JSON shape.
+   *
+   * @param report the library-neutral report to serialize
+   * @return a Jackson {@link ObjectNode} with the OPA coverage shape
+   */
+  public static ObjectNode toJson(CoverageReport report) {
     ObjectNode root = JsonNodeFactory.instance.objectNode();
     ObjectNode filesNode = root.putObject("files");
 
-    Map<Integer, Set<Range>> coveredByFile = profiler.getCoveredRanges();
-
-    List<Integer> fileIndices = new ArrayList<>(coveredByFile.keySet());
-    Collections.sort(fileIndices);
-
-    for (int fileIndex : fileIndices) {
-      if (fileIndex < 0 || fileIndex >= filenames.size()) {
-        continue;
+    for (Map.Entry<String, FileCoverage> entry : report.files().entrySet()) {
+      FileCoverage fileCoverage = entry.getValue();
+      ObjectNode fileEntry = filesNode.putObject(entry.getKey());
+      if (!fileCoverage.covered().isEmpty()) {
+        writeRanges(fileEntry.putArray("covered"), fileCoverage.covered());
       }
-      Set<Range> covered = coveredByFile.get(fileIndex);
-      if (covered == null || covered.isEmpty()) {
-        continue;
+      if (!fileCoverage.notCovered().isEmpty()) {
+        writeRanges(fileEntry.putArray("not_covered"), fileCoverage.notCovered());
       }
-      ObjectNode fileEntry = filesNode.putObject(filenames.get(fileIndex));
-      writeRanges(fileEntry.putArray("covered"), covered);
+      writeTotals(
+          fileEntry,
+          fileCoverage.coveredLines(),
+          fileCoverage.notCoveredLines(),
+          fileCoverage.coverage());
     }
+
+    writeTotals(root, report.coveredLines(), report.notCoveredLines(), report.coverage());
 
     return root;
   }
 
-  private static void writeRanges(ArrayNode array, Collection<Range> ranges) {
-    List<Range> sorted = new ArrayList<>(ranges);
-    sorted.sort(Range::compareTo);
-    for (Range range : sorted) {
+  private static void writeTotals(
+      ObjectNode node, int coveredLines, int notCoveredLines, double coverage) {
+    node.put("covered_lines", coveredLines);
+    node.put("not_covered_lines", notCoveredLines);
+    node.put("coverage", coverage);
+  }
+
+  private static void writeRanges(ArrayNode array, List<Range> ranges) {
+    for (Range range : ranges) {
       ObjectNode rangeNode = array.addObject();
       writePosition(rangeNode.putObject("start"), range.start());
       writePosition(rangeNode.putObject("end"), range.end());
